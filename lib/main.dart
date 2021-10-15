@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:prueba/screens/edit.dart';
 import 'package:prueba/useradd.dart';
 
 void main() {
@@ -72,15 +73,38 @@ class _UserInformationState extends State<UserInformation> {
           return Text("Loading");
         }
 
-        return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data =
-                document.data()! as Map<String, dynamic>;
-            return ListTile(
-              title: Text(data['full_name']),
-              subtitle: Text(data['company'] + ' '+ data['age'].toString()),
+        return ListView.separated(
+          separatorBuilder: (context, index) => SizedBox(
+            height: 10,
+          ),
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            var data = snapshot.data!.docs[index];
+            // ignore: non_constant_identifier_names
+            String full_name = data['full_name'];
+            String company = data['company'];
+            String age = data['age'].toString();
+            String docId = snapshot.data!.docs[index].id;
+
+            return Ink(
+              child: ListTile(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => EditScreen(
+                      currentName: full_name,
+                      currentCompany: company,
+                      currentAge: age,
+                      documentId: docId,
+                    ),
+                  ),
+                ),
+                title: Text(
+                  full_name,
+                ),
+                subtitle: Text(company + ' ' + age),
+              ),
             );
-          }).toList(),
+          },
         );
       },
     );
